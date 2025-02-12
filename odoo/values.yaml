@@ -603,8 +603,10 @@ persistence:
   enabled: true
   ## @param persistence.resourcePolicy Setting it to "keep" to avoid removing PVCs during a helm delete operation. Leaving it empty will delete PVCs after the chart deleted
   ##
-
-  volumeName: "odoo"
+  
+  ## @param primary.persistence.volumeName Name to assign the volume
+  ##
+  volumeName: "data"
 
   resourcePolicy: ""
   ## @param persistence.storageClass Persistent Volume storage class
@@ -641,13 +643,12 @@ persistence:
 
   dynamicVolumeProvisioning:
     enabled: false
-    pvName: pv-intranet-staging-odoo-service
-    pvcName: pvc-intranet-staging-odoo-service
-    localPath: /home/admin/odoo/staging/service_data
+    pvName: ""
+    pvcName: ""
+    localPath: ""
     nodeAffinity:
       key: ""
       value: ""
-
 
 ## 'volumePermissions' init container parameters
 ## Changes the owner and group of the persistent volume mount point to runAsUser:fsGroup values

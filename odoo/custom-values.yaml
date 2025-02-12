@@ -27,12 +27,14 @@ nodeSelector:
 persistence:
   enabled: true
   storageClass: "local-storage"
-  
   dynamicVolumeProvisioning:
     enabled: false
     pvName: pv-intranet-staging-odoo-service-test
     pvcName: pvc-intranet-staging-odoo-service-test
     localPath: /home/admin/odoo/staging/service_data_test
+    nodeAffinity:
+      key: "kubernetes.io/hostname"
+      value: "intranet"
 
 # Postgresql Configuration
 postgresql:
@@ -43,8 +45,15 @@ postgresql:
     database: "intranet"
   primary:
     persistence:
-      storageClass: "local-path"
-      volumeName: "pvc-intranet-staging-odoo-psql"
+      storageClass: "local-storage"
+      dynamicVolumeProvisioning:
+        enabled: false
+        pvName: pv-intranet-staging-odoo-psql-test
+        pvcName: pvc-intranet-staging-odoo-psql-test
+        localPath: /home/admin/odoo/staging/psql_data_test
+        nodeAffinity:
+          key: "kubernetes.io/hostname"
+          value: "intranet"
 
 # tolerations:
 #   - key: "kubernetes.azure.com/scalesetpriority"

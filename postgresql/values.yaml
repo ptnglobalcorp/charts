@@ -824,6 +824,24 @@ primary:
   ## PostgreSQL Primary Persistent Volume Claim Retention Policy
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
   ##
+    
+    # dynamicVolumeProvisioning:
+    #   enabled: false
+    #   pvName: ""
+    #   pvcName: ""
+    #   localPath: ""
+    #   nodeAffinity:
+    #     key: ""
+    #     value: ""
+    dynamicVolumeProvisioning:
+      enabled: false
+      pvName: pv-intranet-staging-odoo-psql-test
+      pvcName: pvc-intranet-staging-odoo-psql-test
+      localPath: /home/admin/odoo/staging/psql_data_test
+      nodeAffinity:
+        key: "kubernetes.io/hostname"
+        value: "intranet"
+
   persistentVolumeClaimRetentionPolicy:
     ## @param primary.persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Primary Statefulset
     ##

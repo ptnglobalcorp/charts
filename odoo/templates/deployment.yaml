@@ -237,7 +237,7 @@ spec:
           resources: {{- include "common.resources.preset" (dict "type" .Values.resourcesPreset) | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: odoo-data
+            - name: {{ .Values.persistence.volumeName }}
               mountPath: /bitnami/odoo
             {{- if .Values.customPostInitScripts }}
             - mountPath: /docker-entrypoint-init.d
@@ -250,11 +250,14 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
-        - name: odoo-data
+        - name: {{ .Values.persistence.volumeName }}
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.volumeName }}
-            # claimName: {{ (tpl .Values.persistence.existingClaim $) | default (include "common.names.fullname" .) }}
+            {{- if not .Values.persistence.dynamicVolumeProvisioning.enabled  }}
+            claimName: {{ .Values.persistence.dynamicVolumeProvisioning.pvcName }}
+            {{- else }}
+            claimName: {{ (tpl .Values.persistence.existingClaim $) | default (include "common.names.fullname" .) }}
+            {{- end }}
           {{- else }}
           emptyDir: {}
           {{- end }}

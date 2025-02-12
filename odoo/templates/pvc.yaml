@@ -2,7 +2,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ coalesce .Values.persistence.dynamicVolumeProvisioning.pvName (include "common.names.fullname" .) }}
+  name: {{ coalesce .Values.persistence.dynamicVolumeProvisioning.pvcName (include "common.names.fullname" .) }}
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
   annotations:

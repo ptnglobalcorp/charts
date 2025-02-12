@@ -15,18 +15,18 @@ spec:
     - {{ .Values.persistence.accessMode | quote }}
   {{- end }}
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.persistence.storageClass }}
   local:
     path: {{ .Values.persistence.dynamicVolumeProvisioning.localPath | quote }}
   claimRef:
     namespace: {{ .Release.Namespace | quote }}
-    name: {{ .Values.persistence.dynamicVolumeProvisioning.pvName | quote }}
-  nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.nodeAffinityPreset.type "key" .Values.nodeAffinityPreset.key "values" .Values.nodeAffinityPreset.values) | nindent 10 }}
-  # nodeAffinity:
-  #   required:
-  #     nodeSelectorTerms:
-  #     - matchExpressions:
-  #       - key: {{ .Values.persistence.dynamicVolumeProvisioning.nodeAffinity.key | default "kubernetes.io/hostname" }}
-  #         operator: In
-  #         values:
-  #         - {{ .Values.persistence.dynamicVolumeProvisioning.value | default "ptn-k8s-worker-01" }}
+    name: {{ .Values.persistence.dynamicVolumeProvisioning.pvcName | quote }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: {{ .Values.persistence.dynamicVolumeProvisioning.nodeAffinity.key }}
+          operator: In
+          values:
+          - {{ .Values.persistence.dynamicVolumeProvisioning.nodeAffinity.value }}
 {{- end }}

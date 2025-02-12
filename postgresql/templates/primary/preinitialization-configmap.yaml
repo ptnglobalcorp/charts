@@ -1,8 +1,3 @@
-{{- /*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
 {{- if and .Values.primary.preInitDb.scripts (not .Values.primary.preInitDb.scriptsConfigMap) }}
 apiVersion: v1
 kind: ConfigMap
