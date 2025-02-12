@@ -1,9 +1,0 @@
-dependencies:
-- name: postgresql
-  repository: file://../postgresql
-  version: 16.4.7
-- name: common
-  repository: file://../common
-  version: 2.29.1
-digest: sha256:aadf86e8346f273b3238dba24f9ace17c7f81a35a054d22bba0363cd5c84b22d
-generated: "2025-02-11T15:31:35.5865136+07:00"
