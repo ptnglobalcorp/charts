@@ -3,7 +3,7 @@ service:
   type: ClusterIP
 
 odooEmail: "support@ptnglobalcorp.com"
-odooPassword: "VdQEEauva!x5"
+odooPassword: "123456"
 
 nodeSelector:
   kubernetes.io/hostname: intranet
@@ -41,7 +41,7 @@ postgresql:
   enabled: true
   auth:
     username: "intranet"
-    password: "VdQEEauva!x5"
+    password: "123456"
     database: "intranet"
   primary:
     persistence:
