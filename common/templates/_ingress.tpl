@@ -1,11 +1,4 @@
 {{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
-{{/* vim: set filetype=mustache: */}}
-
-{{/*
 Generate backend entry that is compatible with all Kubernetes API versions.
 
 Usage:

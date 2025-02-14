@@ -1,11 +1,4 @@
 {{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
-{{/* vim: set filetype=mustache: */}}
-
-{{/*
 Kubernetes standard labels
 {{ include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) -}}
 */}}

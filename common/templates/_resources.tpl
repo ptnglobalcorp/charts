@@ -1,11 +1,4 @@
 {{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
-{{/* vim: set filetype=mustache: */}}
-
-{{/*
 Return a resource request/limit object based on a given preset.
 These presets are for basic testing and not meant to be used in production
 {{ include "common.resources.preset" (dict "type" "nano") -}}

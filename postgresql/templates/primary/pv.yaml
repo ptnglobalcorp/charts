@@ -1,8 +1,8 @@
-{{- if and (not .Values.primary.persistence.dynamicVolumeProvisioning.enabled) .Values.primary.persistence.dynamicVolumeProvisioning.pvName .Values.primary.persistence.dynamicVolumeProvisioning.localPath }}
+{{- if not .Values.primary.persistence.dynamicVolumeProvisioning.enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvName }}
+  name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvName | default (printf "pv-%s" (include "postgresql.v1.primary.fullname" .)) | lower }}
 spec:
   capacity:
     storage: {{ .Values.primary.persistence.size | quote }}
@@ -16,7 +16,7 @@ spec:
     path: {{ .Values.primary.persistence.dynamicVolumeProvisioning.localPath | quote }}
   claimRef:
     namespace: {{ include "common.names.namespace" . | quote }}
-    name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvcName | quote }}
+    name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvcName | default (printf "pvc-%s" (include "postgresql.v1.primary.fullname" .)) | lower }}
   nodeAffinity:
     required:
       nodeSelectorTerms:

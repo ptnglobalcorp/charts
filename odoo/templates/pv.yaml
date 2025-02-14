@@ -1,8 +1,8 @@
-{{- if and (not .Values.persistence.dynamicVolumeProvisioning.enabled) .Values.persistence.dynamicVolumeProvisioning.pvName .Values.persistence.dynamicVolumeProvisioning.localPath }}
+{{- if not .Values.persistence.dynamicVolumeProvisioning.enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.persistence.dynamicVolumeProvisioning.pvName }}
+  name: {{ .Values.persistence.dynamicVolumeProvisioning.pvName | default (printf "pv-%s" (include "common.names.fullname" .)) | lower }}
 spec:
   capacity:
     storage: {{ .Values.persistence.size | quote }}
@@ -20,7 +20,7 @@ spec:
     path: {{ .Values.persistence.dynamicVolumeProvisioning.localPath | quote }}
   claimRef:
     namespace: {{ .Release.Namespace | quote }}
-    name: {{ .Values.persistence.dynamicVolumeProvisioning.pvcName | quote }}
+    name: {{ coalesce .Values.persistence.dynamicVolumeProvisioning.pvcName (include "common.names.fullname" .) }}
   nodeAffinity:
     required:
       nodeSelectorTerms:

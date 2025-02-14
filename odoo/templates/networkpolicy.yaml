@@ -20,3 +20,4 @@ spec:
   ingress:
     - ports:
         - port: {{ .Values.containerPorts.http }}
+{{- end }}
