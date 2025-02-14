@@ -1,6 +1,8 @@
 apiVersion: v2
 appVersion: 0.1.0
 
+name: common
+
 description: A Library Helm Chart.
 icon: https://bitnami.com/assets/stacks/odoo/img/odoo-stack-220x234.png
 home: https://ptnglobalcorp.com/

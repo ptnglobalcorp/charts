@@ -1,0 +1,9 @@
+dependencies:
+- name: common
+  repository: file://../common
+  version: 0.1.0
+- name: postgresql
+  repository: file://../postgresql
+  version: 0.1.0
+digest: sha256:cb660f8c2cd5c9a34a35e9ae75d838a7f29e9b1cc18cc3aea5803c7dbd3a81d4
+generated: "2025-02-14T14:30:06.6441196+07:00"
