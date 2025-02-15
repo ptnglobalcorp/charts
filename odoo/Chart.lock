@@ -1,9 +1,9 @@
 dependencies:
 - name: common
-  repository: file://../common
+  repository: oci://ghcr.io/nilnguyenkl/charts
   version: 0.1.0
 - name: postgresql
-  repository: file://../postgresql
+  repository: oci://ghcr.io/nilnguyenkl/charts
   version: 0.1.0
-digest: sha256:cb660f8c2cd5c9a34a35e9ae75d838a7f29e9b1cc18cc3aea5803c7dbd3a81d4
-generated: "2025-02-14T14:30:06.6441196+07:00"
+digest: sha256:a1db957385d54ccbb1670ad70b722109267b105e426fab67d74e503fb3c2066b
+generated: "2025-02-15T14:18:51.2686849+07:00"
