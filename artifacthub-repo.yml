@@ -1,0 +1,19 @@
+repositoryID: "nilnguyenkl-charts"
+owners:
+  - name: "Nil Nguyen"
+    email: "nilnguyenkl@gmail.com"
+
+# artifacthub-repo.yml
+repository:
+  # Unique identifier for your repository
+  name: my-helm-charts
+  # Display name
+  displayName: My Helm Charts
+  # URL to your repository (GitHub repo URL)
+  url: https://github.com/ptnglobalcorp/charts/tree/feature/custom-chart
+  # Source code URL (optional)
+  sourceCodeURL: https://github.com/ptnglobalcorp/charts/tree/feature/custom-chart
+  # Repository type (helm for Helm charts)
+  type: helm
+  # URL to your Helm charts (GHCR OCI registry)
+  url: oci://ghcr.io/nilnguyenkl/charts
