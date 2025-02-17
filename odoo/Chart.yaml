@@ -11,11 +11,16 @@ sources:
 
 dependencies:
 - name: common
-  repository: oci://ghcr.io/nilnguyenkl/charts
+  repository: oci://registry-1.docker.io/ptnglobalcorp/common
   version: 0.1.0
 - condition: postgresql.enabled
   name: postgresql
-  repository: oci://ghcr.io/nilnguyenkl/charts
+  repository: oci://registry-1.docker.io/ptnglobalcorp/postgresql
   version: 0.1.0
+
+annotations:
+  artifacthub.io/maintainers: |
+    - name: PTN Global
+      email: support@ptnglobalcorp.com
 
 version: 0.1.0

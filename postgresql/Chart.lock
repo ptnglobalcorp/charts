@@ -1,6 +1,0 @@
-dependencies:
-- name: common
-  repository: oci://ghcr.io/nilnguyenkl/charts
-  version: 0.1.0
-digest: sha256:f21b0053dcb6a7fbc28e46e89f20ce97a820c69ed88b1060021acccac14b89b7
-generated: "2025-02-15T14:17:12.065724+07:00"

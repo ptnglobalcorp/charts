@@ -1,9 +1,0 @@
-dependencies:
-- name: common
-  repository: oci://ghcr.io/nilnguyenkl/charts
-  version: 0.1.0
-- name: postgresql
-  repository: oci://ghcr.io/nilnguyenkl/charts
-  version: 0.1.0
-digest: sha256:a1db957385d54ccbb1670ad70b722109267b105e426fab67d74e503fb3c2066b
-generated: "2025-02-15T14:18:51.2686849+07:00"

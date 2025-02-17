@@ -1,5 +1,12 @@
+## @section Global parameters
 global:
   postgresql:
+    ## @param global.postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
+    ## @param global.postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
+    ## @param global.postgresql.auth.password Password for the custom user to create (overrides `auth.password`)
+    ## @param global.postgresql.auth.database Name for a custom database to create (overrides `auth.database`)
+    ## @param global.postgresql.auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.adminPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+    ## @param global.postgresql.auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.userPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
     auth:
       postgresPassword: ""
       username: ""
@@ -8,41 +15,67 @@ global:
       secretKeys:
         adminPasswordKey: ""
         userPasswordKey: ""
+    ## @param global.postgresql.service.ports.postgresql PostgreSQL service port (overrides `service.ports.postgresql`)
     service:
       ports:
         postgresql: ""
 
+## @param kubeVersion Override Kubernetes version
 kubeVersion: ""
+## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
 nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname template
 fullnameOverride: ""
+## @param commonLabels Add labels to all the deployed resources
 commonLabels: {}
+## @param commonAnnotations Add annotations to all the deployed resources
 commonAnnotations: {}
 
+## Enable diagnostic mode in the statefulset
 diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
   enabled: false
 
+## PostgreSQL image
 image:
   registry: docker.io
   repository: bitnami/postgresql
   tag: 17.2.0-debian-12-r10
   digest: ""
+  ## Specify a imagePullPolicy
   pullPolicy: IfNotPresent
+  ## Set to true if you would like to see extra information on logs
   debug: false
 
+## Authentication parameters
 auth:
+  ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
   enablePostgresUser: true
+  ## @param auth.postgresPassword Password for the "postgres" admin user
   postgresPassword: ""
+  ## @param auth.username Name for a custom user to create
   username: ""
+  ## @param auth.password Password for the custom user to create
   password: ""
+  ## @param auth.database Name for a custom database to create
   database: ""
+  ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials
+  ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials
   secretKeys:
     adminPasswordKey: postgres-password
     userPasswordKey: password
+## @param architecture PostgreSQL architecture
 architecture: standalone
-
+## @param containerPorts.postgresql PostgreSQL container port
 containerPorts:
   postgresql: 5432
 
+## Audit settings
+## @param audit.logHostname Log client hostnames
+## @param audit.logConnections Add client log-in operations to the log file
+## @param audit.logDisconnections Add client log-outs operations to the log file
+## @param audit.pgAuditLogCatalog Log catalog using pgAudit
+## @param audit.clientMinMessages Message log level to share with the user
 audit:
   logHostname: false
   logConnections: false
@@ -50,22 +83,41 @@ audit:
   pgAuditLogCatalog: "off"
   clientMinMessages: error
 
+## LDAP configuration
+## @param ldap.enabled Enable LDAP support
 ldap:
   enabled: false
 
+## @param postgresqlDataDir PostgreSQL data dir folder
 postgresqlDataDir: /bitnami/postgresql/data
+## @param postgresqlSharedPreloadLibraries Shared preload libraries (comma-separated list)
 postgresqlSharedPreloadLibraries: "pgaudit"
 
+## Start PostgreSQL pod(s) without limitations on shm memory.
 shmVolume:
+  ## @param shmVolume.enabled Enable emptyDir volume for /dev/shm for PostgreSQL pod(s)
   enabled: true
+  ## @param shmVolume.sizeLimit Set this to enable a size limit on the shm tmpfs
   sizeLimit: ""
 
+## TLS configuration
 tls:
+  ## @param tls.enabled Enable TLS traffic support
   enabled: false
 
-primary:
-  name: primary
 
+## @section PostgreSQL Primary parameters
+
+primary:
+  ## @param primary.name Name of the primary database
+  name: primary
+  ## Configure extra options for PostgreSQL Primary containers' liveness, readiness and startup probes
+  ## @param primary.livenessProbe.enabled Enable livenessProbe on PostgreSQL Primary containers
+  ## @param primary.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param primary.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param primary.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param primary.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param primary.livenessProbe.successThreshold Success threshold for livenessProbe
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30
@@ -73,7 +125,12 @@ primary:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-
+  ## @param primary.readinessProbe.enabled Enable readinessProbe on PostgreSQL Primary containers
+  ## @param primary.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param primary.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param primary.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param primary.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param primary.readinessProbe.successThreshold Success threshold for readinessProbe
   readinessProbe:
     enabled: true
     initialDelaySeconds: 5
@@ -82,10 +139,21 @@ primary:
     failureThreshold: 6
     successThreshold: 1
 
+  ## PostgreSQL Primary resource requests and limits
   resourcesPreset: "nano"
-
   resources: {}
 
+  ## Container Security Context
+  ## @param primary.containerSecurityContext.enabled Enabled containers' Security Context
+  ## @param primary.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
+  ## @param primary.containerSecurityContext.runAsUser Set containers' Security Context runAsUser
+  ## @param primary.containerSecurityContext.runAsGroup Set containers' Security Context runAsGroup
+  ## @param primary.containerSecurityContext.runAsNonRoot Set container's Security Context runAsNonRoot
+  ## @param primary.containerSecurityContext.privileged Set container's Security Context privileged
+  ## @param primary.containerSecurityContext.readOnlyRootFilesystem Set container's Security Context readOnlyRootFilesystem
+  ## @param primary.containerSecurityContext.allowPrivilegeEscalation Set container's Security Context allowPrivilegeEscalation
+  ## @param primary.containerSecurityContext.capabilities.drop List of capabilities to be dropped
+  ## @param primary.containerSecurityContext.seccompProfile.type Set container's Security Context seccomp profile
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
@@ -100,57 +168,102 @@ primary:
     seccompProfile:
       type: "RuntimeDefault"
 
+  ## @param primary.hostIPC Specify if host IPC should be enabled for PostgreSQL pod (postgresql primary)
   hostIPC: false
+  ## @param primary.labels Map of labels to add to the statefulset (postgresql primary)
   labels: {}
+  ## @param primary.podLabels Map of labels to add to the pods (postgresql primary)
   podLabels: {}
+  ## @param primary.podAntiAffinityPreset PostgreSQL primary pod anti-affinity preset
   podAntiAffinityPreset: soft
+  ## @param primary.affinity Affinity for PostgreSQL primary pods assignment
   affinity: {}
+  ## @param primary.nodeSelector Node labels for PostgreSQL primary pods assignment
   nodeSelector: {}
+  ## @param primary.tolerations Tolerations for PostgreSQL primary pods assignment
   tolerations: []
-
+  ## @param primary.updateStrategy.type PostgreSQL Primary statefulset strategy type
+  ## @param primary.updateStrategy.rollingUpdate PostgreSQL Primary statefulset rolling update configuration parameters
   updateStrategy:
     type: RollingUpdate
     rollingUpdate: {}
 
+  ## Pod Disruption Budget configuration
+  ## @param primary.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param primary.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param primary.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `primary.pdb.minAvailable` and `primary.pdb.maxUnavailable` are empty.
   pdb:
     create: true
     minAvailable: ""
     maxUnavailable: ""
 
+  ## Network Policies
   networkPolicy:
     enabled: true
 
+  ## PostgreSQL Primary service configuration
   service:
+    ## @param primary.service.type Kubernetes Service type
     type: ClusterIP
+    ## @param primary.service.ports.postgresql PostgreSQL service port
     ports:
       postgresql: 5432
+    ## @param primary.service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
+    ## If "ClientIP", consecutive client requests will be directed to the same Pod
     sessionAffinity: None
+    ## Headless service properties
     headless:
+      ## @param primary.service.headless.annotations Additional custom annotations for headless PostgreSQL primary service
       annotations: {}
 
   persistence:
+    ## @param primary.persistence.enabled Enable PostgreSQL Primary data persistence using PVC
     enabled: true
+    ## @param primary.persistence.volumeName Name to assign the volume
     volumeName: "data"
+    ## @param primary.persistence.existingClaim Name of an existing PVC to use
     existingClaim: ""
+    ## @param primary.persistence.mountPath The path the volume will be mounted at
+    ## Note: useful when using custom PostgreSQL images
     mountPath: /bitnami/postgresql
+    ## @param primary.persistence.storageClass PVC Storage Class for PostgreSQL Primary data volume
     storageClass: ""
+    ## @param primary.persistence.accessModes PVC Access Mode for PostgreSQL volume
     accessModes:
       - ReadWriteOnce
+    ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     size: 8Gi
+    ## @param primary.persistence.annotations Annotations for the PVC
     annotations: {}
+    ## @param primary.persistence.labels Labels for the PVC
     labels: {}
+    ## @param primary.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
     selector: {}
+    ## @param primary.persistence.dataSource Custom PVC data source
     dataSource: {}
-
+    ## Disables dynamic volume provisioning
     dynamicVolumeProvisioning:
+      ## @param persistence.dynamicVolumeProvisioning.enabled Disables dynamic volume provisioning
       enabled: false
+      ## @param persistence.dynamicVolumeProvisioning.pvName The name of the Persistent Volume
       pvName: ""
+      ## @param persistence.dynamicVolumeProvisioning.pvcName The name of the Persistent Volume Claim
       pvcName: ""
+      ## @param persistence.dynamicVolumeProvisioning.localPath The local filesystem path on the node for storage
       localPath: ""
+      ## Use for node affinity
       nodeAffinity:
+        ## @param persistence.dynamicVolumeProvisioning.nodeAffinity.key The node label key for scheduling
         key: ""
+        ## @param persistence.dynamicVolumeProvisioning.nodeAffinity.value The node label value for scheduling
         value: ""
 
+  ## Pod Security Context
+  ## @param readReplicas.podSecurityContext.enabled Enable security context
+  ## @param readReplicas.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy
+  ## @param readReplicas.podSecurityContext.sysctls Set kernel settings using the sysctl interface
+  ## @param readReplicas.podSecurityContext.supplementalGroups Set filesystem extra groups
+  ## @param readReplicas.podSecurityContext.fsGroup Group ID for the pod
   podSecurityContext:
     enabled: true
     fsGroupChangePolicy: Always
@@ -158,11 +271,21 @@ primary:
     supplementalGroups: []
     fsGroup: 1001
 
+  ## @param primary.hostNetwork Specify if host network should be enabled for PostgreSQL pod (postgresql primary)
   hostNetwork: false
+  ## @param primary.automountServiceAccountToken Mount Service Account token in pod
   automountServiceAccountToken: false
 
+## @section Other Parameters
+
+## Service account for PostgreSQL to use.
 serviceAccount:
+  ## @param serviceAccount.create Enable creation of ServiceAccount for PostgreSQL pod
   create: true
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
   name: ""
+  ## @param serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+  ## Can be set to false if pods using this serviceAccount do not need to use K8s API
   automountServiceAccountToken: false
+  ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
   annotations: {}

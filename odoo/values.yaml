@@ -1,35 +1,68 @@
+## @section Global parameters
+
 global:
   imageRegistry: ""
 
+## @section Common parameters
+
+## @param kubeVersion Override Kubernetes version
 kubeVersion: ""
+## @param nameOverride String to partially override common.names.fullname
 nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
 fullnameOverride: ""
+## @param commonLabels Labels to add to all deployed objects
 commonLabels: {}
+## @param clusterDomain Default Kubernetes cluster domain
 commonAnnotations: {}
 
+## Enable diagnostic mode in the statefulset
 diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode
   enabled: false
 
+## Odoo image
 image:
   registry: docker.io
   repository: bitnami/odoo
   tag: 18.0.20250205-debian-12-r0
   digest: ""
+  ## Specify a imagePullPolicy
   pullPolicy: IfNotPresent
+  ## Enable debug mode
   debug: false
 
+## @param odooEmail Odoo user email
 odooEmail: user@example.com
+## @param odooPassword Odoo user password
+## Defaults to a random 10-character alphanumeric string if not set
+odooPassword: ""
+## @param odooSkipInstall Skip Odoo installation wizard
 odooSkipInstall: false
+## @param odooDatabaseFilter Filter odoo database by using a regex
 odooDatabaseFilter: .*
+## @param loadDemoData Whether to load demo data for all modules during initialization
 loadDemoData: false
+## @param allowEmptyPassword Allow the container to be started with blank passwords
 allowEmptyPassword: false
+## @param replicaCount Number of Odoo replicas to deploy
+## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
 replicaCount: 1
+## Odoo container ports
+## @param containerPorts.http Odoo HTTP container port
 containerPorts:
   http: 8069
 
+## Odoo containers' resource requests and limits
 resourcesPreset: "large"
 resources: {}
 
+## Configure Pods Security Context
+## @param podSecurityContext.enabled Enabled Odoo pods' Security Context
+## @param podSecurityContext.fsGroupChangePolicy Set filesystem group change policy
+## @param podSecurityContext.sysctls Set kernel settings using the sysctl interface
+## @param podSecurityContext.supplementalGroups Set filesystem extra groups
+## @param podSecurityContext.fsGroup Set Odoo pod's Security Context fsGroup
 podSecurityContext:
   enabled: true
   fsGroupChangePolicy: Always
@@ -37,6 +70,18 @@ podSecurityContext:
   supplementalGroups: []
   fsGroup: 0
 
+## Configure Container Security Context (only main container)
+## @param containerSecurityContext.enabled Enabled containers' Security Context
+## @param containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
+## @param containerSecurityContext.runAsUser Set containers' Security Context runAsUser
+## @param containerSecurityContext.runAsGroup Set containers' Security Context runAsGroup
+## @param containerSecurityContext.runAsNonRoot Set container's Security Context runAsNonRoot
+## @param containerSecurityContext.privileged Set container's Security Context privileged
+## @param containerSecurityContext.readOnlyRootFilesystem Set container's Security Context readOnlyRootFilesystem
+## @param containerSecurityContext.allowPrivilegeEscalation Set container's Security Context allowPrivilegeEscalation
+## @param containerSecurityContext.capabilities.add List of capabilities to be added
+## @param containerSecurityContext.capabilities.drop List of capabilities to be dropped
+## @param containerSecurityContext.seccompProfile.type Set container's Security Context seccomp profile
 containerSecurityContext:
   enabled: true
   seLinuxOptions: {}
@@ -52,6 +97,13 @@ containerSecurityContext:
   seccompProfile:
     type: "RuntimeDefault"
 
+## Configure extra options for Odoo containers' liveness and readiness probes
+## @param livenessProbe.enabled Enable livenessProbe
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
 livenessProbe:
   enabled: true
   initialDelaySeconds: 600
@@ -60,6 +112,13 @@ livenessProbe:
   failureThreshold: 6
   successThreshold: 1
 
+## @param readinessProbe.enabled Enable readinessProbe
+## @param readinessProbe.path Path to check for readinessProbe
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
 readinessProbe:
   enabled: true
   path: /web/health
@@ -69,75 +128,141 @@ readinessProbe:
   failureThreshold: 12
   successThreshold: 1
 
+## @param automountServiceAccountToken Mount Service Account token in pod
 automountServiceAccountToken: false
+## @param podLabels Extra labels for Odoo pods
 podLabels: {}
+## @param podAnnotations Annotations for Odoo pods
 podAnnotations: {}
+## @param podAntiAffinityPreset Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
 podAntiAffinityPreset: soft
+## @param affinity Affinity for pod assignment
 affinity: {}
+## @param nodeSelector Node labels for pod assignment
 nodeSelector: {}
+## @param tolerations Tolerations for pod assignment
 tolerations: []
 
+## @param updateStrategy.type Odoo deployment strategy type
+## @param updateStrategy.rollingUpdate [object,nullable] Odoo deployment rolling update configuration parameters
+## e.g:
+## updateStrategy:
+##  type: RollingUpdate
+##  rollingUpdate:
+##    maxSurge: 25%
+##    maxUnavailable: 25%
 updateStrategy:
   type: RollingUpdate
   rollingUpdate: null
 
+## Odoo service parameters
 service:
+  ## @param service.type Odoo service type
   type: ClusterIP
+  ## @param service.ports.http Odoo service HTTP port
   ports:
     http: 80
-
+  ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
   sessionAffinity: None
+  ## @param service.clusterIP Odoo service Cluster IP
   clusterIP: ""
+  ## @param service.annotations Additional custom annotations for Odoo service
   annotations: {}
 
+## Configure the ingress resource that allows you to access the Odoo installation
 ingress:
+  ## @param ingress.enabled Enable ingress record generation for Odoo
   enabled: false
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress
   ingressClassName: ""
+  ## @param ingress.pathType Ingress path type
   pathType: ImplementationSpecific
+  ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
   apiVersion: ""
+  ## @param ingress.hostname Default host for the ingress record
   hostname: odoo.local
+  ## @param ingress.path Default path for the ingress record
   path: /
+  ## @param ingress.annotations [object] Additional annotations for the Ingress resource
   annotations: {}
+  ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
   tls: false
+  ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
   selfSigned: false
+  ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
   extraPaths: []
 
+## Persistence Parameters
 persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
   enabled: true
+  ## @param persistence.volumeName Volume name
   volumeName: "data"
+  ## @param persistence.resourcePolicy Setting it to "keep" to avoid removing PVCs during a helm delete operation. Leaving it empty will delete PVCs after the chart deleted
   resourcePolicy: ""
+  ## @param persistence.storageClass Persistent Volume storage class
   storageClass: ""
+  ## @param persistence.accessModes [array] Persistent Volume access modes
   accessModes:
     - ReadWriteOnce
+  ## @param persistence.accessMode Persistent Volume access mode (DEPRECATED: use `persistence.accessModes` instead)
   accessMode: ReadWriteOnce
+  ## @param persistence.size Persistent Volume size
   size: 10Gi
+  ## @param persistence.dataSource Custom PVC data source
   dataSource: {}
+  ## @param persistence.annotations Annotations for the PVC
   annotations: {}
+  ## @param persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
   selector: {}
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
   existingClaim: ""
+  ## Disables dynamic volume provisioning
   dynamicVolumeProvisioning:
+    ## @param persistence.dynamicVolumeProvisioning.enabled Disables dynamic volume provisioning
     enabled: false
+    ## @param persistence.dynamicVolumeProvisioning.pvName The name of the Persistent Volume
     pvName: ""
+    ## @param persistence.dynamicVolumeProvisioning.pvcName The name of the Persistent Volume Claim
     pvcName: ""
+    ## @param persistence.dynamicVolumeProvisioning.localPath The local filesystem path on the node for storage
     localPath: ""
+    ## Use for node affinity
     nodeAffinity:
+      ## @param persistence.dynamicVolumeProvisioning.nodeAffinity.key The node label key for scheduling
       key: ""
+      ## @param persistence.dynamicVolumeProvisioning.nodeAffinity.value The node label value for scheduling
       value: ""
 
+## @section RBAC Parameters
+
+## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+## @param serviceAccount.name The name of the ServiceAccount to create (name generated using common.names.fullname template otherwise)
+## @param serviceAccount.automountServiceAccountToken Auto-mount the service account token in the pod
+## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
 serviceAccount:
   create: true
   name: ""
   automountServiceAccountToken: false
   annotations: {}
 
+## Odoo Pod Disruption Budget configuration
+## @param pdb.create Enable a Pod Disruption Budget creation
+## @param pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+## @param pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `pdb.minAvailable` and `pdb.maxUnavailable` are empty.
 pdb:
   create: true
   minAvailable: ""
   maxUnavailable: ""
 
+## Odoo Autoscaling configuration
 autoscaling:
   enabled: false
 
+## @section Database Parameters
+
+## PostgreSQL chart configuration
+## ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
 postgresql:
   enabled: true
   auth:
@@ -145,5 +270,8 @@ postgresql:
     password: ""
     database: bitnami_odoo
 
+## @section NetworkPolicy parameters
+
+## Network Policy configuration
 networkPolicy:
   enabled: true
