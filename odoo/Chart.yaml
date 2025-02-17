@@ -3,7 +3,7 @@ appVersion: 0.1.0
 
 name: odoo
 
-description: A Odoo Helm Chart
+description: Odoo — An open-source ERP and CRM platform—on both local and cloud-based Kubernetes clusters. It offers flexible storage configurations, supporting both local storage solutions and cloud-native storage classes from providers like AWS, GCP, or Azure.
 icon: https://bitnami.com/assets/stacks/odoo/img/odoo-stack-220x234.png
 home: https://ptnglobalcorp.com/
 sources:
