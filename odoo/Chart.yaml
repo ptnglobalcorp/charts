@@ -11,11 +11,11 @@ sources:
 
 dependencies:
 - name: common
-  repository: oci://registry-1.docker.io/ptnglobalcorp/common
+  repository: oci://registry-1.docker.io/ptnglobalcorp
   version: 0.1.0
 - condition: postgresql.enabled
   name: postgresql
-  repository: oci://registry-1.docker.io/ptnglobalcorp/postgresql
+  repository: oci://registry-1.docker.io/ptnglobalcorp
   version: 0.1.0
 
 annotations:
