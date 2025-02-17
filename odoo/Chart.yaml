@@ -3,9 +3,20 @@ appVersion: 0.1.0
 
 name: odoo
 
-description: Odoo — An open-source ERP and CRM platform—on both local and cloud-based Kubernetes clusters. It offers flexible storage configurations, supporting both local storage solutions and cloud-native storage classes from providers like AWS, GCP, or Azure.
-icon: https://bitnami.com/assets/stacks/odoo/img/odoo-stack-220x234.png
+description: An open-source ERP and CRM platform on both local and cloud-based Kubernetes clusters. It offers flexible storage configurations, supporting both local storage solutions and cloud native storage classes from providers like AWS, GCP, or Azure.
 home: https://ptnglobalcorp.com/
+icon: https://bitnami.com/assets/stacks/odoo/img/odoo-stack-220x234.png
+keywords:
+- odoo
+- crm
+- erp
+- app
+- modules
+- custom
+- www
+- http
+- web
+
 sources:
 - https://github.com/ptnglobalcorp/charts/tree/main/odoo
 
