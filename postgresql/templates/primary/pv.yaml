@@ -1,0 +1,28 @@
+{{- if not .Values.primary.persistence.dynamicVolumeProvisioning.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvName | default (printf "pv-%s" (include "postgresql.v1.primary.fullname" .)) | lower }}
+spec:
+  capacity:
+    storage: {{ .Values.primary.persistence.size | quote }}
+  accessModes:
+  {{- range .Values.primary.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.primary.persistence.storageClass }}
+  local:
+    path: {{ .Values.primary.persistence.dynamicVolumeProvisioning.localPath | quote }}
+  claimRef:
+    namespace: {{ include "common.names.namespace" . | quote }}
+    name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvcName | default (printf "pvc-%s" (include "postgresql.v1.primary.fullname" .)) | lower }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: {{ .Values.primary.persistence.dynamicVolumeProvisioning.nodeAffinity.key }}
+          operator: In
+          values:
+          - {{ .Values.primary.persistence.dynamicVolumeProvisioning.nodeAffinity.value }}
+{{- end }}

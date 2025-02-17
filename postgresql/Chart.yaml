@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: 0.1.0
+
+name: postgresql
+
+description: PostgreSQL (Postgres) is an open source object-relational database known for reliability and data integrity. ACID-compliant, it supports foreign keys, joins, views, triggers and stored procedures.
+icon: https://dyltqmyl993wv.cloudfront.net/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+home: https://ptnglobalcorp.com/
+sources:
+- https://github.com/ptnglobalcorp/charts/tree/main/postgresql
+
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/ptnglobalcorp
+  version: 0.1.0
+
+annotations:
+  artifacthub.io/maintainers: |
+    - name: PTN Global
+      email: support@ptnglobalcorp.com
+
+version: 0.1.0

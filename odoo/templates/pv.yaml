@@ -1,0 +1,32 @@
+{{- if not .Values.persistence.dynamicVolumeProvisioning.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistence.dynamicVolumeProvisioning.pvName | default (printf "pv-%s" (include "common.names.fullname" .)) | lower }}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size | quote }}
+  accessModes:
+  {{- if not (empty .Values.persistence.accessModes) }}
+  {{- range .Values.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- else }}
+    - {{ .Values.persistence.accessMode | quote }}
+  {{- end }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.persistence.storageClass }}
+  local:
+    path: {{ .Values.persistence.dynamicVolumeProvisioning.localPath | quote }}
+  claimRef:
+    namespace: {{ .Release.Namespace | quote }}
+    name: {{ coalesce .Values.persistence.dynamicVolumeProvisioning.pvcName (include "common.names.fullname" .) }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: {{ .Values.persistence.dynamicVolumeProvisioning.nodeAffinity.key }}
+          operator: In
+          values:
+          - {{ .Values.persistence.dynamicVolumeProvisioning.nodeAffinity.value }}
+{{- end }}

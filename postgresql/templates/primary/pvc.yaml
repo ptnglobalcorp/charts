@@ -1,0 +1,24 @@
+{{- if not .Values.primary.persistence.dynamicVolumeProvisioning.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvcName | default (printf "pvc-%s" (include "postgresql.v1.primary.fullname" .)) | lower }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  {{- if .Values.primary.persistence.annotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.annotations "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.primary.persistence.labels }}
+  labels: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.labels "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- range .Values.primary.persistence.accessModes }}
+    - {{ . | quote }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.primary.persistence.size | quote }}
+  {{- if .Values.primary.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.selector "context" $) | nindent 4 }}
+  {{- end }}
+{{- end }}

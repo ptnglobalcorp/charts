@@ -1,0 +1,209 @@
+{{- $customUser := include "postgresql.v1.username" . }}
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "postgresql.v1.primary.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.primary.labels .Values.commonLabels ) "context" . ) }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: primary
+  {{- if or .Values.commonAnnotations .Values.primary.annotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.primary.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  serviceName: {{ include "postgresql.v1.primary.svc.headless" . }}
+  {{- if .Values.primary.updateStrategy }}
+  updateStrategy: {{- toYaml .Values.primary.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.primary.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      name: {{ include "postgresql.v1.primary.fullname" . }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: primary
+      {{- if .Values.primary.podAnnotations }}
+      annotations:
+        {{- if .Values.primary.podAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.primary.podAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "postgresql.v1.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.primary.automountServiceAccountToken }}
+      {{- if .Values.primary.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.primary.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.primary.podAntiAffinityPreset "component" "primary" "customLabels" $podLabels "context" $) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.primary.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.primary.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.primary.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.primary.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.primary.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.primary.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      hostNetwork: {{ .Values.primary.hostNetwork }}
+      hostIPC: {{ .Values.primary.hostIPC }}
+      containers:
+        - name: postgresql
+          image: {{ include "postgresql.v1.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.primary.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.primary.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: BITNAMI_DEBUG
+              value: {{ ternary "true" "false" (or .Values.image.debug .Values.diagnosticMode.enabled) | quote }}
+            - name: POSTGRESQL_PORT_NUMBER
+              value: {{ .Values.containerPorts.postgresql | quote }}
+            - name: POSTGRESQL_VOLUME_DIR
+              value: {{ .Values.primary.persistence.mountPath | quote }}
+            {{- if .Values.primary.persistence.mountPath }}
+            - name: PGDATA
+              value: {{ .Values.postgresqlDataDir | quote }}
+            {{- end }}
+            # Authentication
+            - name: POSTGRES_USER
+              value: {{ $customUser | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.v1.secretName" . }}
+                  key: {{ include "postgresql.v1.userPasswordKey" . }}
+            {{- if .Values.auth.enablePostgresUser }}
+            - name: POSTGRES_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.v1.secretName" . }}
+                  key: {{ include "postgresql.v1.adminPasswordKey" . }}
+            {{- end }}
+            {{- if (include "postgresql.v1.database" .) }}
+            - name: POSTGRES_DATABASE
+              value: {{ (include "postgresql.v1.database" .) | quote }}
+            {{- end }}
+            # LDAP
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: {{ ternary "yes" "no" .Values.ldap.enabled | quote }}
+            # TLS
+            - name: POSTGRESQL_ENABLE_TLS
+              value: {{ ternary "yes" "no" .Values.tls.enabled | quote }}
+            # Audit
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: {{ .Values.audit.logHostname | quote }}
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: {{ .Values.audit.logConnections | quote }}
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: {{ .Values.audit.logDisconnections | quote }}
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: {{ .Values.audit.pgAuditLogCatalog | quote }}
+            # Others
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: {{ .Values.audit.clientMinMessages | quote }}
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: {{ .Values.postgresqlSharedPreloadLibraries | quote }}
+          ports:
+            - name: tcp-postgresql
+              containerPort: {{ .Values.containerPorts.postgresql }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.primary.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.livenessProbe "enabled") "context" $) | nindent 12 }}
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U {{ default "postgres" $customUser | quote }} -d "dbname={{ include "postgresql.v1.database" . }} -h 127.0.0.1 -p {{ .Values.containerPorts.postgresql }}
+          {{- end }}
+          {{- if .Values.primary.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.readinessProbe "enabled") "context" $) | nindent 12 }}
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                {{- include "postgresql.v1.readinessProbeCommand" . | nindent 16 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.primary.resources }}
+          resources: {{- toYaml .Values.primary.resources | nindent 12 }}
+          {{- else if ne .Values.primary.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.primary.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/postgresql/conf
+              subPath: app-conf-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/postgresql/tmp
+              subPath: app-tmp-dir
+            {{- if .Values.shmVolume.enabled }}
+            - name: dshm
+              mountPath: /dev/shm
+            {{- end }}
+            - name: {{ .Values.primary.persistence.volumeName }}
+              mountPath: {{ .Values.primary.persistence.mountPath }}
+              {{- if .Values.primary.persistence.subPath }}
+              subPath: {{ .Values.primary.persistence.subPath }}
+              {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        {{- if .Values.shmVolume.enabled }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            {{- if .Values.shmVolume.sizeLimit }}
+            sizeLimit: {{ .Values.shmVolume.sizeLimit }}
+            {{- end }}
+        {{- end }}
+        {{- if or (and .Values.primary.persistence.enabled .Values.primary.persistence.existingClaim) (not .Values.primary.persistence.dynamicVolumeProvisioning.enabled) }}
+        {{- if not .Values.primary.persistence.dynamicVolumeProvisioning.enabled }}
+        - name: {{ .Values.primary.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.primary.persistence.dynamicVolumeProvisioning.pvcName }}
+        {{- else }}
+        - name: {{ .Values.primary.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.primary.persistence.existingClaim $ }}
+        {{- end }}
+        {{- else if not .Values.primary.persistence.enabled }}
+        - name: {{ .Values.primary.persistence.volumeName }}
+          emptyDir: {}
+        {{- end }}
+  {{- if .Values.primary.persistence.dynamicVolumeProvisioning.enabled }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.primary.persistence.volumeName }}
+        {{- if .Values.primary.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.primary.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.primary.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.primary.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.primary.persistence.size | quote }}
+        {{- if .Values.primary.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+  {{- end }}
