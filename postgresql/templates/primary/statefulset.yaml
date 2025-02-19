@@ -119,7 +119,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - exec pg_isready -U {{ default "postgres" $customUser | quote }} -d "dbname={{ include "postgresql.v1.database" . }} -h 127.0.0.1 -p {{ .Values.containerPorts.postgresql }}
+                - exec pg_isready -U {{ default "postgres" $customUser | quote }} -d "dbname={{ include "postgresql.v1.database" . }}" -h 127.0.0.1 -p {{ .Values.containerPorts.postgresql }}
           {{- end }}
           {{- if .Values.primary.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.readinessProbe "enabled") "context" $) | nindent 12 }}

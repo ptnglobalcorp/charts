@@ -24,7 +24,7 @@ Return the Postgresql hostname
 Return the Postgresql port
 */}}
 {{- define "odoo.databasePort" -}}
-{{- "5432" -}}
+"5432"
 {{- end -}}
 
 {{/*
